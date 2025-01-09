@@ -37,7 +37,7 @@ jobs:
             results.json
             result.html
 
-build:
+  build:
     name: Build Docker Image
     runs-on: ubuntu-latest
  
