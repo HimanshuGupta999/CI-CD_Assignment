@@ -1,0 +1,36 @@
+name: K6 CI/CD
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+      
+jobs:
+  k6_load_test:
+    name: Run K6 Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install K6
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gnupg software-properties-common
+          curl -s https://dl.k6.io/key.gpg | sudo apt-key add -
+          echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install -y k6
+      
+      - name: Run K6 Tests
+        run: |
+          k6 run --out json=results.json k6/sampleTest.js   
+      
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: results.json
